@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="../Ucodejs/ucode_paper.js"></script>
+    <script>
+        var titleText;
+        var fire = 0;
+        var ship;
+        var enemy;         //http://js.students.ucode.com/.ucode/projects/drawing_5/project_drawing_5_pencil.html
+        var score = 0;
+        var scoreText;
+        var speedX = 3;
+        var speedY = 3;
+        var background;
+        var background2;
+        var backgroundStartY = 150;
+        var background2StartY = backgroundStartY - 536;
+        var bullet;
+        var rotation = 0;
+        var rotationIncrease = 1;
+        var playing;        //IDK
+        var timer = 0;        //Enemy spawn timer+
+        function drawBasic() {
+            //Game Sprites 
+            background = importRasterFromId('background');
+            background.position = point(354, backgroundStartY);
+            background2 = background.clone();
+            background2.position = point(354, background2StartY );            
+            paper.project.importSVG('../Ucodejs/Drawing6/Assets/ucode_space_ship.svg', function(item) {
+                ship = item;
+                ship.position = point(300, 350);
+                ship.scale(0.3);
+            });
+            paper.project.importSVG('../Ucodejs/Drawing6/Assets/enemy_space_ship.svg', function(item) {
+                enemy = item;
+                enemy.position = point(-1000, 200);
+                enemy.scale(0.7);
+                createEnemies();
+            });
+            createBullet(); //function call to createBullet function
+            scoreText = text('Score: ' + score, 40, 15, 20, 'red', 'blue');
+            
+        }
+        function createEnemies() { 
+            
+            for(var i = 0; i < 7; i++)        //For Loop to arrange enemies
+                createEnemy(100 + 70 * i, 50 + 10 * i);
+            
+        }
+        function createEnemy(x, y) { 
+           
+            var newEnemy = enemy.clone(); // Creates clone of original enemy
+            newEnemy.position = point(x, y - 50);    //then positions
+            newEnemy.onFrame = enemyOnFrame;    //and finally moves the enemies
+            
+        }
+        function enemyOnFrame(event) { //OnFrame for enemy only
+            
+            this.position.y += 1;
+
+                if(this.position.y > 700) { //once enemy leaves screen
+                     this.remove();    //delete enemy
+                }  
+//             if(this.hitTest(ship.position)) { //Enemy touches ship
+//                     ship.remove(); //Ship dies
+//                 }
+        }
+        function onFrame(event) { //Update
+            timer ++;    //Spawn timer
+            fire ++;
+            
+            if(fire>10){
+                fire = 0;
+            }
+            if(timer>400){
+                timer = 0;       //reset Timer
+                createEnemies();    //Spawn enemies
+            }
+                if(background.position.y >=  675) {    //Background Scrolling
+                    background.position.y = background2StartY;
+                    
+                } else if(background2.position.y>= 675 ){
+                    background2.position.y = background2StartY;
+                }
+            else{
+                    background.position.y += 1;
+                    background2.position.y += 1;
+                }
+            //Ship Controls
+                if(paper.Key.isDown('up') && ship.position.y > 0) ship.position.y -= speedY;
+                if(paper.Key.isDown('down')) ship.position.y += speedY;
+                if(paper.Key.isDown('left')) ship.position.x -= speedX;
+                if(paper.Key.isDown('right')) ship.position.x += speedX;
+            //Ship Movement limitation
+                if(ship) {
+                    if(ship.position.x > 600) 
+                        ship.position.x = 600;
+                    if(ship.position.x < 0) 
+                        ship.position.x = 0;
+                    if(ship.position.y > 400) 
+                        ship.position.y = 400;
+                    if(ship.position.y < 0) 
+                        ship.position.y = 0;
+                }          
+            
+            setRotation();
+            rotateChildren();
+            
+        }
+        function setRotation() {    //A rotation mechanism
+            
+            if(rotation > 10) 
+                rotationIncrease = -1;
+            else if(rotation < -10) 
+                rotationIncrease = 1;
+            rotation += rotationIncrease;
+            
+        }
+        function rotateChildren() { //Begin Rotation
+            
+            paper.project.activeLayer.children.forEach(function(item) {
+                if(item.index >= 2 && item != item.index) 
+                    item.rotate(rotationIncrease);
+            });
+            
+        }
+        function onKeyDown(event) {    //Key event listener
+            
+                if(event.key == 'space') //Space key event listener
+                    fireMissile();    //Fires missile
+          
+        }
+        function createBullet() {
+            
+            bullet = importRasterFromId('bullet');
+            bullet.rotate(1);
+            bullet.scale(.5);
+            bullet.position = point(-1000, 200);
+            
+        }
+        function fireMissile() {
+            
+           // if(fire<3){
+            var newBullet = bullet.clone();    //Clones Missile 
+            newBullet.position = ship.position;    //Moves Missile to ship
+            newBullet.position.y -= 50;    //Missile moves up
+            newBullet.onFrame = function(){
+            this.position.y -= 5;
+            
+         //   }
+            }//bulletOnFrame;      
+            
+        }
+        
+        function bulletOnFrame() {
+            
+            this.position.y -= 5;
+            if(this.position.y < 0) this.remove();
+            var thisBullet = this;
+            paper.project.activeLayer.children.forEach(function(item) {
+                if(item.index > 1 && item != scoreText && item != ship && item != thisBullet && item != background && item != background2 &&  item.hitTest(thisBullet.position)) {
+//                    if(item.hitTest(thisBullet.position)) {
+                    item.remove();
+                    score++;
+                    scoreText.content = 'Score: ' + score;
+                    
+                }
+            });
+            
+           
+        }
+        function menu(){
+            
+            
+        }
+    </script>
+</head>
+<body>
+    <img id="background" style="display: none" src="Ucodejs/Drawing6/Assets/star_background.jpg">
+    <img id="bullet" style="display: none" src="Ucodejs/Drawing6/Assets/Cohete-Chico.gif">
+    <img id="ship" style="display: none" src="Ucodejs/Drawing6/Assets/ucode_space_ship.svg">
+    <img id="enemy" style="display: none" src="Ucodejs/Drawing6/Assets/enemy_space_ship.svg">
+    <!--ship, enemy  -->
+    <script>
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29362848-1']);
+        _gaq.push(['_setDomainName', 'js.students.ucode.com']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</body>
+</html>
+
+
+
+
+
