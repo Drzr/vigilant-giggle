@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="../Ucodejs/ucode_paper.js"></script>
+    <script>
+        var ana;
+        var spot;
+        var marks;
+        var dots;
+        var fish
+        function drawBasic() {
+            
+            ana = serpant();
+            dots = marks();
+            fish = line()
+        }
+
+        function serpant(snake, eyeX, eyeY, eyeRadius) {
+            eyeX = 500;
+            eyeY = 200;
+            eyeRadius = 12;
+            snake = line(eyeX + 30, eyeY, eyeX + 10, eyeY - 20);
+            snake.lineTo(point(eyeX - 20, eyeY - 10));
+            snake.lineTo(point(eyeX - 100, eyeY + 10));
+            snake.lineTo(point(eyeX - 150, eyeY - 30));
+            snake.lineTo(point(eyeX - 350, eyeY + 30));
+            snake.lineTo(point(eyeX - 350, eyeY + 60));
+            snake.lineTo(point(eyeX - 200, eyeY + 10));
+            snake.lineTo(point(eyeX - 140, eyeY + 40));
+            snake.lineTo(point(eyeX + 30, eyeY + 40));
+            snake.smooth();
+            snake.fillColor = 'yellow';
+            circle(eyeX, eyeY, eyeRadius, 'black', 'white');
+            circle(eyeX + 3, eyeY + 3, eyeRadius / 2, 'black', 'red');
+            var path = line(eyeX + 30, eyeY, eyeX, eyeY + 20);
+            var nextPoint = point(eyeX + 30, eyeY + 40);
+            path.lineTo(nextPoint);
+         //  path.fillColor = 'white';
+            
+            //polygon(eyeX + 15, eyeY + 10, eyeX, eyeY + 20, eyeX + 15, eyeY + 30, eyeX + 55, eyeY + 30, eyeX + 35, eyeY + 20, eyeX + 55, eyeY + 10, eyeX + 15, eyeY + 10, 'black', 'red');
+            
+            
+            //snake.clone().rotate(90).zindex = -1;  
+        }
+        function marks(eyeX, eyeY){
+            spot = polygon(515,210, 500, 220,515,230,545,230,535,220,528,228, 'black', 'green');
+            spot.smooth();
+            spot.position = point(300, 194);
+            spot.clone().rotate(-30).position = point(170, 239);
+            spot.clone().rotate(30).position = point(440, 226);            
+        }
+
+        function onFrame(event) {
+            for(i=3;i<=50;i++)
+                spot.rotate(i);
+           
+        }
+    </script>
+</head>
+
+<body>
+    <script>
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29362848-1']);
+        _gaq.push(['_setDomainName', 'js.students.ucode.com']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</body>
+
+</html>
